@@ -1,0 +1,43 @@
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
+            cost: 12
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            provider: user_provider
+            anonymous: ~
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+            # activate different ways to authenticate
+
+#            http_basic: ~
+            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
+
+            form_login:
+                login_path: authorize
+                check_path: signin_user
+                username_parameter: user_login[email]
+                password_parameter: user_login[password]
+                success_handler: acme.security.authentication_handler
+                failure_handler: acme.security.authentication_handler
+
+            logout:
+                path:   /logout
+                target: /authorize
+            # https://symfony.com/doc/current/security/form_login_setup.html
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/admin, roles: ROLE_USER }
